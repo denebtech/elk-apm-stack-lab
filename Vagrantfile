@@ -8,10 +8,16 @@ Vagrant.configure("2") do |config|
     elk.vm.hostname = "elkserver.local.com"
     elk.vm.box = "ubuntu/focal64"
     elk.vm.network :private_network, ip: "192.168.56.101"
+    elk.vm.network "forwarded_port", guest: 9200, host: 1920
+    elk.vm.network "forwarded_port", guest: 5601, host: 1560
 
-    elk.vm.provision "shell", inline: <<-SHELL
-      sudo apt update
-    SHELL
+    # provisioning
+    elk.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbook.yml"
+    end
+    config.vm.provision "file", source: "./docker/elk.yml", destination: "compose.yml"
+    config.vm.provision "file", source: "./docker/.env", destination: ".env"
+
   end
 
   config.vm.define "webapp" do |webapp|
@@ -19,9 +25,10 @@ Vagrant.configure("2") do |config|
     webapp.vm.box = "ubuntu/focal64"
     webapp.vm.network :private_network, ip: "192.168.56.102"
 
-    webapp.vm.provision "shell", inline: <<-SHELL
-      sudo apt update
-    SHELL
+    # provisioning
+    webapp.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbook.yml"
+    end
   end
 
   config.vm.define "api" do |api|
@@ -29,9 +36,10 @@ Vagrant.configure("2") do |config|
     api.vm.box = "ubuntu/focal64"
     api.vm.network :private_network, ip: "192.168.56.103"
 
-    api.vm.provision "shell", inline: <<-SHELL
-      sudo apt update
-    SHELL
+    # provisioning
+    api.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbook.yml"
+    end
   end
 
   config.vm.provider "virtualbox" do |vb|

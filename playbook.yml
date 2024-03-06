@@ -1,0 +1,21 @@
+- hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache.
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+  vars:
+    pip_install_packages:
+      - name: docker
+    docker_install_compose_plugin: false
+    docker_compose_package: docker-compose-plugin
+    docker_compose_package_state: present
+    docker_users:
+      - vagrant
+
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
